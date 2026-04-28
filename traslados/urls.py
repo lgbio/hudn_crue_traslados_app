@@ -23,7 +23,6 @@ urlpatterns = [
 
 	# ── Reportes ─────────────────────────────────────────────────────────────
 	path ('reportes/excel/', views.VistaReporteExcel.as_view (), name='reporte-excel'),
-	path ('reportes/pdf/', views.VistaReportePdf.as_view (), name='reporte-pdf'),
 	path ('perfil/contrasena/', views.VistaCambiarContrasenaPropia.as_view (), name='cambiar-contrasena'),
 	path ('usuarios/', views.vistaListaUsuarios, name='usuarios'),
 	path ('usuarios/nuevo/', views.vistaCrearUsuario, name='usuario-nuevo'),

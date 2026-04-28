@@ -48,9 +48,9 @@
 					hx-trigger="change"
 					hx-include="#filtros-form"
 				>
-					{% for m in meses %}
-					<option value="{{ m }}" {% if m == mesSeleccionado %}selected{% endif %} {% if m > mesActual %}disabled{% endif %}>
-						{{ m }}
+					{% for numMes, nombreMes in meses %}
+					<option value="{{ numMes }}" {% if numMes == mesSeleccionado %}selected{% endif %} {% if numMes > mesActual %}disabled{% endif %}>
+						{{ nombreMes }}
 					</option>
 					{% endfor %}
 				</select>

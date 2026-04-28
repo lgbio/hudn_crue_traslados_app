@@ -22,10 +22,17 @@ from django.db import IntegrityError
 from .forms import FormularioCambiarContrasenaPropia, FormularioCambiarContrasenaUsuario, FormularioCrearUsuario, FormularioTraslado
 from .models import ControlMes, TrasladoPaciente
 from .services.report_excel import generarExcel
-from .services.report_pdf import generarPdf
 
 Usuario = get_user_model ()
 logger = logging.getLogger (__name__)
+
+# ─── Nombres de meses en español ─────────────────────────────────────────────
+
+NOMBRES_MESES = [
+	(1, 'Enero'), (2, 'Febrero'), (3, 'Marzo'), (4, 'Abril'),
+	(5, 'Mayo'), (6, 'Junio'), (7, 'Julio'), (8, 'Agosto'),
+	(9, 'Septiembre'), (10, 'Octubre'), (11, 'Noviembre'), (12, 'Diciembre'),
+]
 
 
 # ─── Decorador de acceso exclusivo para DIRECTOR ─────────────────────────────
@@ -141,7 +148,7 @@ class VistaMain (LoginRequiredMixin, TemplateView):
 			'rolUsuario': rolUsuario,
 			'fechaActual': hoy,
 			'erroresFiltro': erroresFiltro,
-			'meses': list (range (1, 13)),
+			'meses': NOMBRES_MESES,
 			'mesActual': mesActual,
 			'diasEnMes': diasEnMes,
 		})
@@ -502,37 +509,6 @@ class VistaReporteExcel (LoginRequiredMixin, View):
 			bytesArchivo,
 			content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 		)
-		respuesta ['Content-Disposition'] = f'attachment; filename="{nombreArchivo}"'
-		return respuesta
-
-
-# ─── Vista: reporte PDF ───────────────────────────────────────────────────────
-
-class VistaReportePdf (LoginRequiredMixin, View):
-	"""Genera y descarga el reporte PDF de traslados filtrados por mes y rango de días."""
-
-	def get (self, request):
-		"""Lee los parámetros de filtro, genera el PDF y retorna la respuesta de descarga."""
-		mes, diaDesde, diaHasta, anio = _obtenerFiltros (request)
-
-		fechaDesde = datetime.date (anio, mes, diaDesde)
-		fechaHasta = datetime.date (anio, mes, diaHasta)
-
-		queryset = TrasladoPaciente.objects.filter (
-			mes=mes,
-			fecha__gte=fechaDesde,
-			fecha__lte=fechaHasta,
-		)
-
-		try:
-			bytesArchivo, nombreArchivo = generarPdf (queryset, mes)
-		except Exception as exc:
-			logger.exception ('Error al generar el reporte PDF: %s', exc)
-			return render (request, 'traslados/error_reporte.html', {
-				'mensaje': 'Ocurrió un error al generar el reporte PDF. Por favor, intente nuevamente.',
-			}, status=500)
-
-		respuesta = HttpResponse (bytesArchivo, content_type='application/pdf')
 		respuesta ['Content-Disposition'] = f'attachment; filename="{nombreArchivo}"'
 		return respuesta
 
