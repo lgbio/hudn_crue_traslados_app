@@ -8,7 +8,7 @@
 	@keydown.escape.window="document.getElementById('modal-overlay').remove()"
 >
 	<div
-		class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-screen overflow-y-auto z-50"
+		class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto z-50"
 		@click.stop
 	>
 		{# ── Encabezado del modal ────────────────────────────────────────── #}
@@ -51,74 +51,73 @@
 			</div>
 			{% endif %}
 
-			{# ── Fila: Fecha y Hora Reporte ──────────────────────────────── #}
-			<div class="grid grid-cols-2 gap-4">
+			{# ── Fila: Fecha Reporte + Hora Reporte ──────────────────────── #}
+			<div class="grid grid-cols-3 gap-4">
 				<div>
-					<label for="{{ formulario.fecha.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-						Fecha <span class="text-red-500">*</span>
+					<label class="block text-sm font-medium text-gray-700 mb-1">
+						Fecha Reporte <span class="text-red-500">*</span>
 					</label>
-					{{ formulario.fecha }}
-					{% if formulario.fecha.errors %}
-					<p class="mt-1 text-xs text-red-600">{{ formulario.fecha.errors|join:", " }}</p>
+					<div class="grid grid-cols-[2fr_1fr] gap-2">
+						{{ formulario.fecha_reporte }}
+					</div>
+					{% if formulario.fecha_reporte.errors %}
+					<p class="mt-1 text-xs text-red-600">{{ formulario.fecha_reporte.errors|join:", " }}</p>
 					{% endif %}
 				</div>
-				<div>
-					<label for="{{ formulario.hora_reporte.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-						Hora Reporte <span class="text-red-500">*</span>
-					</label>
-					{{ formulario.hora_reporte }}
-					{% if formulario.hora_reporte.errors %}
-					<p class="mt-1 text-xs text-red-600">{{ formulario.hora_reporte.errors|join:", " }}</p>
-					{% endif %}
-				</div>
-			</div>
 
-			{# ── Fila: Hora Egreso y Hora Ingreso ────────────────────────── #}
-			<div class="grid grid-cols-2 gap-4">
+				{# ── Fila: Fecha Egreso + Hora Egreso ────────────────────────── #}
 				<div>
-					<label for="{{ formulario.hora_egreso.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-						Hora de Egreso
+					<label class="block text-sm font-medium text-gray-700 mb-1">
+						Fecha Egreso
 					</label>
-					{{ formulario.hora_egreso }}
-					{% if formulario.hora_egreso.errors %}
-					<p class="mt-1 text-xs text-red-600">{{ formulario.hora_egreso.errors|join:", " }}</p>
+					<div class="grid grid-cols-[2fr_1fr] gap-2">
+						{{ formulario.fecha_egreso }}
+					</div>
+					{% if formulario.fecha_egreso.errors %}
+					<p class="mt-1 text-xs text-red-600">{{ formulario.fecha_egreso.errors|join:", " }}</p>
 					{% endif %}
 				</div>
+
+				{# ── Fila: Fecha Ingreso + Hora Ingreso ──────────────────────── #}
 				<div>
-					<label for="{{ formulario.hora_ingreso.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-						Hora de Ingreso
+					<label class="block text-sm font-medium text-gray-700 mb-1">
+						Fecha Ingreso
 					</label>
-					{{ formulario.hora_ingreso }}
-					{% if formulario.hora_ingreso.errors %}
-					<p class="mt-1 text-xs text-red-600">{{ formulario.hora_ingreso.errors|join:", " }}</p>
+					<div class="grid grid-cols-[2fr_1fr] gap-2">
+						{{ formulario.fecha_ingreso }}
+					</div>
+					{% if formulario.fecha_ingreso.errors %}
+					<p class="mt-1 text-xs text-red-600">{{ formulario.fecha_ingreso.errors|join:", " }}</p>
 					{% endif %}
 				</div>
 			</div>
 
 			{# ── Nombre de Paciente ──────────────────────────────────────── #}
-			<div>
-				<label for="{{ formulario.nombre_paciente.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-					Nombre de Paciente <span class="text-red-500">*</span>
-				</label>
-				{{ formulario.nombre_paciente }}
-				{% if formulario.nombre_paciente.errors %}
-				<p class="mt-1 text-xs text-red-600">{{ formulario.nombre_paciente.errors|join:", " }}</p>
-				{% endif %}
-			</div>
+			<div class="grid grid-cols-2 gap-4">
+				<div>
+					<label for="{{ formulario.nombre_paciente.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+						Nombre de Paciente <span class="text-red-500">*</span>
+					</label>
+					{{ formulario.nombre_paciente }}
+					{% if formulario.nombre_paciente.errors %}
+					<p class="mt-1 text-xs text-red-600">{{ formulario.nombre_paciente.errors|join:", " }}</p>
+					{% endif %}
+				</div>
 
-			{# ── Documento ───────────────────────────────────────────────── #}
-			<div>
-				<label for="{{ formulario.documento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-					Documento <span class="text-red-500">*</span>
-				</label>
-				{{ formulario.documento }}
-				{% if formulario.documento.errors %}
-				<p class="mt-1 text-xs text-red-600">{{ formulario.documento.errors|join:", " }}</p>
-				{% endif %}
+				{# ── Documento ───────────────────────────────────────────────── #}
+				<div>
+					<label for="{{ formulario.documento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+						Documento <span class="text-red-500">*</span>
+					</label>
+					{{ formulario.documento }}
+					{% if formulario.documento.errors %}
+					<p class="mt-1 text-xs text-red-600">{{ formulario.documento.errors|join:", " }}</p>
+					{% endif %}
+				</div>
 			</div>
 
 			{# ── Fila: Servicio y Quien Reporta ──────────────────────────── #}
-			<div class="grid grid-cols-2 gap-4">
+			<div class="grid grid-cols-3 gap-4">
 				<div>
 					<label for="{{ formulario.servicio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
 						Servicio
@@ -137,10 +136,6 @@
 					<p class="mt-1 text-xs text-red-600">{{ formulario.quien_reporta.errors|join:", " }}</p>
 					{% endif %}
 				</div>
-			</div>
-
-			{# ── Fila: Destino y Procedimiento ───────────────────────────── #}
-			<div class="grid grid-cols-2 gap-4">
 				<div>
 					<label for="{{ formulario.destino.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
 						Destino
@@ -150,6 +145,11 @@
 					<p class="mt-1 text-xs text-red-600">{{ formulario.destino.errors|join:", " }}</p>
 					{% endif %}
 				</div>
+	
+			</div>
+
+			<div class="grid grid-cols-3 gap-4">
+				{# ── Fila: Destino y Procedimiento ───────────────────────────── #}
 				<div>
 					<label for="{{ formulario.procedimiento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
 						Procedimiento
@@ -159,10 +159,8 @@
 					<p class="mt-1 text-xs text-red-600">{{ formulario.procedimiento.errors|join:", " }}</p>
 					{% endif %}
 				</div>
-			</div>
 
-			{# ── Fila: Médico y Conductor ─────────────────────────────────── #}
-			<div class="grid grid-cols-2 gap-4">
+				{# ── Fila: Médico y Aux. Enfermería ──────────────────────────── #}
 				<div>
 					<label for="{{ formulario.medico.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
 						Médico
@@ -173,6 +171,19 @@
 					{% endif %}
 				</div>
 				<div>
+					<label for="{{ formulario.aux_enfermeria.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+						Aux. Enfermería
+					</label>
+					{{ formulario.aux_enfermeria }}
+					{% if formulario.aux_enfermeria.errors %}
+					<p class="mt-1 text-xs text-red-600">{{ formulario.aux_enfermeria.errors|join:", " }}</p>
+					{% endif %}
+				</div>
+			</div>
+
+			{# ── Fila: Conductor y Radio Operador ────────────────────────── #}
+			<div class="grid grid-cols-3 gap-4">
+				<div>
 					<label for="{{ formulario.conductor.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
 						Conductor
 					</label>
@@ -181,10 +192,6 @@
 					<p class="mt-1 text-xs text-red-600">{{ formulario.conductor.errors|join:", " }}</p>
 					{% endif %}
 				</div>
-			</div>
-
-			{# ── Fila: Radio Operador y Ambulancia ───────────────────────── #}
-			<div class="grid grid-cols-2 gap-4">
 				<div>
 					<label for="{{ formulario.radio_operador.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
 						Radio Operador
@@ -194,6 +201,8 @@
 					<p class="mt-1 text-xs text-red-600">{{ formulario.radio_operador.errors|join:", " }}</p>
 					{% endif %}
 				</div>
+
+				{# ── Ambulancia de Traslado ──────────────────────────────────── #}
 				<div>
 					<label for="{{ formulario.ambulancia.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
 						Ambulancia de Traslado

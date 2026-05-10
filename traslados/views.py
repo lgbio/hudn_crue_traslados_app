@@ -20,7 +20,7 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 
 from .forms import FormularioCambiarContrasenaPropia, FormularioCambiarContrasenaUsuario, FormularioCrearUsuario, FormularioTraslado
-from .models import ControlMes, TrasladoPaciente
+from .models import TrasladoPaciente
 from .services.report_excel import generarExcel
 
 Usuario = get_user_model ()
@@ -128,12 +128,6 @@ class VistaMain (LoginRequiredMixin, TemplateView):
 			diaDesde = 1
 			diaHasta = diasEnMes
 
-		# ── Obtener estado del mes seleccionado ──────────────────────────────
-		try:
-			estadoMes = ControlMes.objects.get (mes=mesSeleccionado)
-		except ControlMes.DoesNotExist:
-			estadoMes = None
-
 		# ── Obtener rol del usuario ──────────────────────────────────────────
 		try:
 			rolUsuario = self.request.user.rol
@@ -144,7 +138,6 @@ class VistaMain (LoginRequiredMixin, TemplateView):
 			'mesSeleccionado': mesSeleccionado,
 			'diaDesde': diaDesde,
 			'diaHasta': diaHasta,
-			'estadoMes': estadoMes,
 			'rolUsuario': rolUsuario,
 			'fechaActual': hoy,
 			'erroresFiltro': erroresFiltro,
@@ -256,40 +249,21 @@ def _obtenerFiltros (request):
 
 
 def _obtenerContextoTabla (mes, diaDesde, diaHasta, anio):
-	"""Construye el queryset filtrado y el estado del mes para el partial de tabla."""
+	"""Construye el queryset filtrado para el partial de tabla."""
 	fechaDesde = datetime.date (anio, mes, diaDesde)
 	fechaHasta = datetime.date (anio, mes, diaHasta)
 
 	registros = TrasladoPaciente.objects.filter (
-		mes=mes,
-		fecha__gte=fechaDesde,
-		fecha__lte=fechaHasta,
+		fecha_reporte__date__gte=fechaDesde,
+		fecha_reporte__date__lte=fechaHasta,
 	)
-
-	try:
-		controlMes = ControlMes.objects.get (mes=mes)
-	except ControlMes.DoesNotExist:
-		controlMes = None
-
-	mesCerrado = controlMes.estaCerrado () if controlMes else False
 
 	return {
 		'registros': registros,
-		'controlMes': controlMes,
-		'mesCerrado': mesCerrado,
 		'mes': mes,
 		'diaDesde': diaDesde,
 		'diaHasta': diaHasta,
 	}
-
-
-def _mesCerrado (mes):
-	"""Retorna True si el ControlMes para el mes dado está CERRADO."""
-	try:
-		control = ControlMes.objects.get (mes=mes)
-		return control.estaCerrado ()
-	except ControlMes.DoesNotExist:
-		return False
 
 
 # ─── Vista HTMX: tabla de registros ──────────────────────────────────────────
@@ -317,12 +291,10 @@ class VistaNuevoTrasladoHTMX (LoginRequiredMixin, View):
 			return datetime.date.today ().month
 
 	def get (self, request):
-		"""Retorna el modal con formulario vacío; 403 si el mes está cerrado."""
+		"""Retorna el modal con formulario vacío."""
 		mes = self._obtenerMesActivo (request)
-		if _mesCerrado (mes):
-			return HttpResponse ('El mes está cerrado. No se pueden crear registros.', status=403)
 
-		formulario = FormularioTraslado (initial={'fecha': datetime.date.today ()})
+		formulario = FormularioTraslado ()
 		return render (request, 'traslados/partials/modal_form.html', {
 			'formulario': formulario,
 			'accion': 'crear',
@@ -335,9 +307,6 @@ class VistaNuevoTrasladoHTMX (LoginRequiredMixin, View):
 			mes = int (request.POST.get ('mes', datetime.date.today ().month))
 		except (ValueError, TypeError):
 			mes = datetime.date.today ().month
-
-		if _mesCerrado (mes):
-			return HttpResponse ('El mes está cerrado. No se pueden crear registros.', status=403)
 
 		formulario = FormularioTraslado (request.POST)
 		if formulario.is_valid ():
@@ -371,10 +340,8 @@ class VistaEditarTrasladoHTMX (LoginRequiredMixin, View):
 	"""Muestra el formulario precargado (GET) y actualiza el registro (POST)."""
 
 	def get (self, request, pk):
-		"""Retorna el modal con datos del registro; 404 si no existe; 403 si mes cerrado."""
+		"""Retorna el modal con datos del registro; 404 si no existe."""
 		registro = get_object_or_404 (TrasladoPaciente, pk=pk)
-		if _mesCerrado (registro.mes):
-			return HttpResponse ('El mes está cerrado. No se pueden editar registros.', status=403)
 
 		formulario = FormularioTraslado (instance=registro)
 		return render (request, 'traslados/partials/modal_form.html', {
@@ -387,8 +354,6 @@ class VistaEditarTrasladoHTMX (LoginRequiredMixin, View):
 	def post (self, request, pk):
 		"""Valida y guarda los cambios; retorna tabla actualizada o modal con errores."""
 		registro = get_object_or_404 (TrasladoPaciente, pk=pk)
-		if _mesCerrado (registro.mes):
-			return HttpResponse ('El mes está cerrado. No se pueden editar registros.', status=403)
 
 		formulario = FormularioTraslado (request.POST, instance=registro)
 		if formulario.is_valid ():
@@ -425,10 +390,8 @@ class VistaConfirmarEliminarHTMX (LoginRequiredMixin, View):
 	"""Muestra el partial de confirmación de eliminación."""
 
 	def get (self, request, pk):
-		"""Retorna el partial de confirmación; 404 si no existe; 403 si mes cerrado."""
+		"""Retorna el partial de confirmación; 404 si no existe."""
 		registro = get_object_or_404 (TrasladoPaciente, pk=pk)
-		if _mesCerrado (registro.mes):
-			return HttpResponse ('El mes está cerrado. No se pueden eliminar registros.', status=403)
 
 		return render (request, 'traslados/partials/confirmar_eliminar.html', {
 			'registro': registro,
@@ -441,12 +404,9 @@ class VistaEliminarTrasladoHTMX (LoginRequiredMixin, View):
 	"""Elimina un registro y retorna la tabla actualizada."""
 
 	def delete (self, request, pk):
-		"""Elimina el registro; retorna tabla actualizada; 404 si no existe; 403 si mes cerrado."""
+		"""Elimina el registro; retorna tabla actualizada; 404 si no existe."""
 		registro = get_object_or_404 (TrasladoPaciente, pk=pk)
 		mes = registro.mes
-
-		if _mesCerrado (mes):
-			return HttpResponse ('El mes está cerrado. No se pueden eliminar registros.', status=403)
 
 		registro.delete ()
 
@@ -456,27 +416,6 @@ class VistaEliminarTrasladoHTMX (LoginRequiredMixin, View):
 		respuesta = render (request, 'traslados/partials/table.html', contexto)
 		respuesta ['HX-Trigger'] = 'cerrarModal'
 		return respuesta
-
-
-# ─── Vista: cerrar mes ────────────────────────────────────────────────────────
-
-@directorRequerido
-def vistaCerrarMes (request, mes):
-	"""Cierra el mes indicado (solo DIRECTOR, solo POST).
-
-	Cambia ControlMes.estado a CERRADO, registra la fecha y el usuario que cerró.
-	Retorna 404 si no existe el ControlMes para el mes dado.
-	"""
-	if request.method != 'POST':
-		return HttpResponse ('Método no permitido.', status=405)
-
-	controlMes = get_object_or_404 (ControlMes, mes=mes)
-	controlMes.estado = 'CERRADO'
-	controlMes.fecha_cierre = timezone.now ()
-	controlMes.cerrado_por = request.user
-	controlMes.save ()
-
-	return redirect ('principal')
 
 
 # ─── Vista: reporte Excel ─────────────────────────────────────────────────────
@@ -492,9 +431,8 @@ class VistaReporteExcel (LoginRequiredMixin, View):
 		fechaHasta = datetime.date (anio, mes, diaHasta)
 
 		queryset = TrasladoPaciente.objects.filter (
-			mes=mes,
-			fecha__gte=fechaDesde,
-			fecha__lte=fechaHasta,
+			fecha_reporte__date__gte=fechaDesde,
+			fecha_reporte__date__lte=fechaHasta,
 		)
 
 		try:
@@ -598,7 +536,7 @@ def vistaLimpiarSistema (request):
 	"""Muestra la página de limpieza anual (GET) y ejecuta la limpieza (POST) (solo DIRECTOR).
 
 	GET: muestra sugerencia de generar reportes y el formulario de confirmación.
-	POST confirmado: elimina todos los TrasladoPaciente y restablece todos los ControlMes a ABIERTO.
+	POST confirmado: elimina todos los TrasladoPaciente.
 	POST cancelado: redirige a la vista principal sin modificar datos.
 	"""
 	if request.method == 'GET':
@@ -613,7 +551,7 @@ def vistaLimpiarSistema (request):
 	if accion == 'confirmar':
 		_ejecutarLimpieza ()
 		from django.contrib import messages
-		messages.success (request, 'Limpieza completada: todos los registros han sido eliminados y los meses han sido restablecidos a ABIERTO.')
+		messages.success (request, 'Limpieza completada: todos los registros han sido eliminados.')
 		return redirect ('principal')
 
 	# Acción desconocida: redirigir sin modificar
@@ -621,9 +559,8 @@ def vistaLimpiarSistema (request):
 
 
 def _ejecutarLimpieza ():
-	"""Elimina todos los TrasladoPaciente y restablece todos los ControlMes a ABIERTO."""
+	"""Elimina todos los TrasladoPaciente."""
 	TrasladoPaciente.objects.all ().delete ()
-	ControlMes.objects.all ().update (estado='ABIERTO', fecha_cierre=None, cerrado_por=None)
 
 
 # ─── Vista: eliminar usuario ──────────────────────────────────────────────────

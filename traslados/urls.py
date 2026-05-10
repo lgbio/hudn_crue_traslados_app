@@ -29,5 +29,4 @@ urlpatterns = [
 	path ('usuarios/<int:pk>/contrasena/', views.vistaCambiarContrasenaUsuario, name='usuario-contrasena'),
 	path ('usuarios/<int:pk>/eliminar/', views.vistaEliminarUsuario, name='usuario-eliminar'),
 	path ('sistema/limpiar/', views.vistaLimpiarSistema, name='limpiar-sistema'),
-	path ('mes/<int:mes>/cerrar/', views.vistaCerrarMes, name='cerrar-mes'),
 ]

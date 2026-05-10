@@ -32,7 +32,7 @@
 
 		{% include 'traslados/main_title.html' %}
 		{# ── Barra de título con filtros ─────────────────────────────────── #}
-		<header class="bg-white shadow-sm px-6 py-3 flex flex-wrap items-center gap-4">
+		<header id="filtros-form" class="bg-white shadow-sm px-6 py-3 flex items-center gap-4">
 
 			<h1 class="text-lg font-bold text-blue-900 mr-4">Filtros</h1>
 
@@ -43,7 +43,7 @@
 					id="id_mes"
 					name="mes"
 					class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-					hx-get="/traslados/tabla/"
+					hx-get="{% url 'tabla-traslados' %}"
 					hx-target="#contenedor-tabla"
 					hx-trigger="change"
 					hx-include="#filtros-form"
@@ -67,10 +67,6 @@
 					min="1"
 					max="{{ diasEnMes }}"
 					class="border border-gray-300 rounded-md px-2 py-1 text-sm w-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
-					hx-get="/traslados/tabla/"
-					hx-target="#contenedor-tabla"
-					hx-trigger="change"
-					hx-include="#filtros-form"
 				>
 			</div>
 
@@ -84,38 +80,39 @@
 					min="1"
 					max="{{ diasEnMes }}"
 					class="border border-gray-300 rounded-md px-2 py-1 text-sm w-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
-					hx-get="/traslados/tabla/"
-					hx-target="#contenedor-tabla"
-					hx-trigger="change"
-					hx-include="#filtros-form"
 				>
 			</div>
 
-			{# ── Botón Cerrar mes (solo DIRECTOR) ────────────────────────── #}
-			{% if rolUsuario == 'DIRECTOR' %}
-			<form method="post" action="{% url 'cerrar-mes' mesSeleccionado %}" class="inline">
-				{% csrf_token %}
-				<button
-					type="submit"
-					{% if estadoMes and estadoMes.estado == 'CERRADO' %}disabled{% endif %}
-					class="px-3 py-1 rounded-md text-sm font-medium bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-				>
-					{% if estadoMes and estadoMes.estado == 'CERRADO' %}
-						Mes cerrado
-					{% else %}
-						Cerrar mes
-					{% endif %}
-				</button>
-			</form>
-			{% endif %}
+			{# ── Botón Buscar ────────────────────────────────────────────── #}
+			<button
+				type="button"
+				class="px-3 py-1 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+				hx-get="{% url 'tabla-traslados' %}"
+				hx-target="#contenedor-tabla"
+				hx-swap="innerHTML"
+				hx-include="#filtros-form"
+			>
+				Buscar
+			</button>
 
-			{# ── Estado del mes ──────────────────────────────────────────── #}
-			{% if estadoMes %}
-			<span class="px-2 py-1 rounded-full text-xs font-semibold
-				{% if estadoMes.estado == 'CERRADO' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-				{{ estadoMes.estado }}
+			{# ── Espaciador flexible ─────────────────────────────────────── #}
+			<div class="flex-1"></div>
+
+			{# ── Info de registros + Botón Adicionar (lado derecho) ───────── #}
+			<span id="info-registros-header" class="text-sm text-gray-500">
+				—
 			</span>
-			{% endif %}
+			<button
+				hx-get="{% url 'traslado-nuevo' %}?mes={{ mesSeleccionado }}"
+				hx-target="#modal-contenedor"
+				hx-swap="innerHTML"
+				class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+				</svg>
+				Adicionar
+			</button>
 
 			{# ── Mensajes de error de validación ─────────────────────────── #}
 			{% if erroresFiltro %}
@@ -132,13 +129,6 @@
 			{% endif %}
 
 		</header>
-
-		{# ── Formulario oculto para incluir filtros en peticiones HTMX ───── #}
-		<form id="filtros-form" class="hidden">
-			<input type="hidden" name="mes" value="{{ mesSeleccionado }}">
-			<input type="hidden" name="dia_desde" value="{{ diaDesde }}">
-			<input type="hidden" name="dia_hasta" value="{{ diaHasta }}">
-		</form>
 
 		{# ── Contenedor de tabla ─────────────────────────────────────────── #}
 		<main class="flex-1 overflow-auto p-4">

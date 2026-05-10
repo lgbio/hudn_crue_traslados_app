@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import ControlMes, TrasladoPaciente, Usuario
+from .models import TrasladoPaciente, Usuario
 
 
 class AdminUsuario (UserAdmin):
@@ -21,32 +21,23 @@ class AdminUsuario (UserAdmin):
 	)
 
 
-class AdminControlMes (admin.ModelAdmin):
-	"""Configuración del panel de administración para el modelo ControlMes."""
-
-	list_display = ['mes', 'estado', 'fecha_cierre', 'cerrado_por']
-	list_filter = ['estado']
-	ordering = ['mes']
-
-
 class AdminTrasladoPaciente (admin.ModelAdmin):
 	"""Configuración del panel de administración para el modelo TrasladoPaciente."""
 
 	list_display = [
-		'fecha',
-		'mes',
+		'fecha_reporte',
 		'nombre_paciente',
 		'documento',
 		'servicio',
 		'destino',
+		'aux_enfermeria',
 		'conductor',
 		'ambulancia',
 	]
-	list_filter = ['mes', 'servicio', 'destino']
+	list_filter = ['servicio', 'destino']
 	search_fields = ['nombre_paciente', 'documento', 'conductor']
-	ordering = ['fecha', 'hora_reporte']
+	ordering = ['-fecha_reporte']
 
 
 admin.site.register (Usuario, AdminUsuario)
-admin.site.register (ControlMes, AdminControlMes)
 admin.site.register (TrasladoPaciente, AdminTrasladoPaciente)

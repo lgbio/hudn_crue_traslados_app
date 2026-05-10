@@ -1,6 +1,4 @@
-"""
-Servicio de generación de reportes Excel para traslados de pacientes.
-"""
+"""Servicio de generación de reportes Excel para traslados de pacientes."""
 
 import io
 
@@ -9,10 +7,9 @@ import openpyxl
 
 # Encabezados en español en el orden definido por el modelo TrasladoPaciente
 ENCABEZADOS = [
-	'FECHA',
-	'HORA REPORTE',
-	'HORA DE EGRESO',
-	'HORA DE INGRESO',
+	'FECHA REPORTE',
+	'FECHA EGRESO',
+	'FECHA INGRESO',
 	'NOMBRE DE PACIENTE',
 	'DOCUMENTO',
 	'SERVICIO',
@@ -20,6 +17,7 @@ ENCABEZADOS = [
 	'DESTINO',
 	'PROCEDIMIENTO',
 	'MÉDICO',
+	'AUX. ENFERMERÍA',
 	'CONDUCTOR',
 	'RADIO OPERADOR',
 	'AMBULANCIA DE TRASLADO',
@@ -50,11 +48,14 @@ def generarExcel (queryset, mes):
 
 	# Escribir una fila por registro
 	for registro in queryset:
+		# Eliminar tzinfo para compatibilidad con openpyxl (Excel no soporta timezones)
+		fechaReporte = registro.fecha_reporte.replace (tzinfo=None) if registro.fecha_reporte else ''
+		fechaEgreso = registro.fecha_egreso.replace (tzinfo=None) if registro.fecha_egreso else ''
+		fechaIngreso = registro.fecha_ingreso.replace (tzinfo=None) if registro.fecha_ingreso else ''
 		fila = [
-			registro.fecha,
-			registro.hora_reporte,
-			registro.hora_egreso,
-			registro.hora_ingreso,
+			fechaReporte,
+			fechaEgreso,
+			fechaIngreso,
 			registro.nombre_paciente,
 			registro.documento,
 			registro.servicio,
@@ -62,6 +63,7 @@ def generarExcel (queryset, mes):
 			registro.destino,
 			registro.procedimiento,
 			registro.medico,
+			registro.aux_enfermeria,
 			registro.conductor,
 			registro.radio_operador,
 			registro.ambulancia,
