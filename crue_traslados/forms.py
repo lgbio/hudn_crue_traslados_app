@@ -38,18 +38,34 @@ class WidgetFechaHoraSeparados (forms.SplitDateTimeWidget):
 		# Llamar al __init__ de MultiWidget directamente, pasando los sub-widgets
 		forms.MultiWidget.__init__ (self, widgets=widgetsFechaHora, attrs=attrs)
 
+	def decompress (self, value):
+		"""Descompone un datetime en [fecha, hora] para los sub-widgets."""
+		if value:
+			from django.utils import timezone
+			if hasattr (value, 'tzinfo') and value.tzinfo is not None:
+				value = timezone.localtime (value)
+			if hasattr (value, 'date') and hasattr (value, 'time'):
+				return [value.date (), value.time ()]
+			return [value, None]
+		return [None, None]
+
 
 # ─── Campo SplitDateTimeField que acepta hora vacía ──────────────────────────
 
 class CampoFechaHoraOpcional (forms.SplitDateTimeField):
-	"""SplitDateTimeField que retorna None cuando el componente de hora está vacío."""
+	"""SplitDateTimeField que usa 00:00 cuando el componente de hora está vacío."""
 
 	def clean (self, value):
-		"""Retorna None si la hora está vacía, independientemente de la fecha."""
+		"""Si la hora está vacía pero hay fecha, combina la fecha con 00:00."""
 		# value es una lista [fecha_str, hora_str] proveniente del SplitDateTimeWidget
 		if isinstance (value, (list, tuple)) and len (value) == 2:
+			fechaStr = value [0]
 			horaStr = value [1]
-			if not horaStr or not str (horaStr).strip ():
+			if fechaStr and (not horaStr or not str (horaStr).strip ()):
+				# Fecha presente pero hora vacía: usar 00:00
+				value = [fechaStr, '00:00']
+			elif not fechaStr:
+				# Sin fecha: retornar None
 				return None
 		return super ().clean (value)
 
@@ -207,8 +223,8 @@ class FormularioTraslado (forms.ModelForm):
 			horaActual = datetime.datetime.now ().strftime ('%H:%M')
 
 			self.initial ['fecha_reporte'] = [hoyISO, horaActual]
-			self.initial ['fecha_egreso'] = [hoyISO, '']
-			self.initial ['fecha_ingreso'] = [hoyISO, '']
+			self.initial ['fecha_egreso'] = [hoyISO, '00:00']
+			self.initial ['fecha_ingreso'] = [hoyISO, '00:00']
 
 	def clean_fecha_egreso (self):
 		"""Retorna None si el componente de hora está vacío."""
