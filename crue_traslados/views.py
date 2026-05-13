@@ -385,41 +385,6 @@ class VistaReporteExcel (CrueRequiredMixin, View):
 		return respuesta
 
 
-# ─── Vista: limpiar datos del sistema ────────────────────────────────────────
-
-@crue_required
-@user_passes_test (_esStaff)
-def vistaLimpiarSistema (request):
-	"""Muestra la página de limpieza anual (GET) y ejecuta la limpieza (POST) (solo staff).
-
-	GET: muestra sugerencia de generar reportes y el formulario de confirmación.
-	POST confirmado: elimina todos los Traslado.
-	POST cancelado: redirige a la vista principal sin modificar datos.
-	"""
-	if request.method == 'GET':
-		return render (request, 'crue_traslados/limpiar_sistema.html')
-
-	# ── POST: verificar si el usuario confirmó o canceló ────────────────────
-	accion = request.POST.get ('accion', '')
-
-	if accion == 'cancelar':
-		return redirect ('crue_traslados:principal')
-
-	if accion == 'confirmar':
-		_ejecutarLimpieza ()
-		from django.contrib import messages
-		messages.success (request, 'Limpieza completada: todos los registros han sido eliminados.')
-		return redirect ('crue_traslados:principal')
-
-	# Acción desconocida: redirigir sin modificar
-	return redirect ('crue_traslados:principal')
-
-
-def _ejecutarLimpieza ():
-	"""Elimina todos los registros de Traslado."""
-	Traslado.objects.all ().delete ()
-
-
 # ─── Vista: cambiar contraseña propia ────────────────────────────────────────
 
 # ─── Vista: importar desde Excel ──────────────────────────────────────────────

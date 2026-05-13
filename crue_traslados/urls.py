@@ -26,9 +26,6 @@ urlpatterns = [
 	# ── Importar ──────────────────────────────────────────────────────────────
 	path ('importar/excel/', views.VistaImportarExcel.as_view (), name='importar-excel'),
 
-	# ── Administración del sistema ───────────────────────────────────────────
-	path ('sistema/limpiar/', views.vistaLimpiarSistema, name='limpiar-sistema'),
-
 	# ── Gestión de cuenta ─────────────────────────────────────────────────────
 	path ('perfil/contrasena/', views.VistaCambiarContrasena.as_view (), name='cambiar-contrasena'),
 ]
