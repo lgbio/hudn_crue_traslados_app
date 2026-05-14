@@ -223,8 +223,8 @@ class FormularioTraslado (forms.ModelForm):
 			horaActual = datetime.datetime.now ().strftime ('%H:%M')
 
 			self.initial ['fecha_reporte'] = [hoyISO, horaActual]
-			self.initial ['fecha_egreso'] = [hoyISO, '00:00']
-			self.initial ['fecha_ingreso'] = [hoyISO, '00:00']
+			self.initial ['fecha_egreso'] = ['', '']
+			self.initial ['fecha_ingreso'] = ['', '']
 
 	def clean_fecha_egreso (self):
 		"""Retorna None si el componente de hora está vacío."""

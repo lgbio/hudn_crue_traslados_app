@@ -126,10 +126,10 @@ USE_TZ        = True
 USE_X_FORWARDED_HOST = True
 STATICFILES_DIRS  = []
 
-DEBUG = True
-LOCAL = False
+DEBUG   = True
+RUNTYPE = "SERVICE"  # Run as LOCAL or as "SERVICE"
 
-if LOCAL:
+if RUNTYPE == "LOCAL":
     # ─── Archivos estáticos ──────────────────────────────────────────────────────
     #FORCE_SCRIPT_NAME = '/crue-traslados'
     STATIC_URL        = '/static/'
