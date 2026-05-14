@@ -17,7 +17,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "http")
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
-    'http://192.168.1.79',
+    'http://192.168.1.80',
     'http://172.20.10.250',
     'http://172.20.211.163',
     'http://172.20.209.60',
@@ -123,21 +123,36 @@ USE_I18N      = True
 USE_TZ        = True
 
 # ─── Configuration for running either: local or service  ─────────────────────────
-DEBUG = True
-
 USE_X_FORWARDED_HOST = True
 STATICFILES_DIRS  = []
-# ─── Archivos estáticos ──────────────────────────────────────────────────────
-FORCE_SCRIPT_NAME = '/'
-STATIC_URL        = '/static/'
-STATIC_ROOT       = BASE_DIR / 'staticfiles'
-# ─── Archivos de medios ──────────────────────────────────────────────────────
-MEDIA_URL        = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-# ─── Autenticación ───────────────────────────────────────────────────────────
-LOGIN_URL = '/crue-traslados/login/'
-LOGIN_REDIRECT_URL = '/crue-traslados/'
-LOGOUT_REDIRECT_URL = '/crue-traslados/login/'
+
+DEBUG = True
+LOCAL = False
+
+if LOCAL:
+    # ─── Archivos estáticos ──────────────────────────────────────────────────────
+    #FORCE_SCRIPT_NAME = '/crue-traslados'
+    STATIC_URL        = '/static/'
+    STATIC_ROOT       = BASE_DIR / 'staticfiles'
+    # ─── Archivos de medios ──────────────────────────────────────────────────────
+    MEDIA_URL        = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    # ─── Autenticación ───────────────────────────────────────────────────────────
+    LOGIN_URL = '/login/'
+    LOGIN_REDIRECT_URL = '/'
+    LOGOUT_REDIRECT_URL = LOGIN_URL
+else:
+    # ─── Archivos estáticos ──────────────────────────────────────────────────────
+    FORCE_SCRIPT_NAME = '/crue-traslados'
+    STATIC_URL        = '/crue-traslados/static/'
+    STATIC_ROOT       = BASE_DIR / 'staticfiles'
+    # ─── Archivos de medios ──────────────────────────────────────────────────────
+    MEDIA_URL        = '/crue-traslados/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    # ─── Autenticación ───────────────────────────────────────────────────────────
+    LOGIN_URL           = '/crue-traslados/login/'
+    LOGIN_REDIRECT_URL  = '/crue-traslados/'
+    LOGOUT_REDIRECT_URL = LOGIN_URL
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
