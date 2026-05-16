@@ -31,7 +31,7 @@
 		<tbody class="bg-white divide-y divide-gray-100" id="tabla-cuerpo">
 			{% for registro in registros %}
 			<tr
-				class="{% if registro.fecha_reporte|date:'H:i' == '00:00' or registro.fecha_egreso|date:'H:i' == '00:00' or registro.fecha_ingreso|date:'H:i' == '00:00' %}bg-green-200{% endif %} hover:bg-blue-50 transition-colors cursor-pointer"
+				class="hover:bg-blue-50 transition-colors cursor-pointer"
 				data-editar-url="{% url 'crue_traslados:traslado-editar' registro.pk %}"
 				hx-get="{% url 'crue_traslados:traslado-editar' registro.pk %}"
 				hx-target="#modal-contenedor"
