@@ -128,9 +128,11 @@ USE_X_FORWARDED_HOST = True
 STATICFILES_DIRS  = []
 
 DEBUG   = True
-RUNTYPE = "SERVICE"  # Run as LOCAL or as "SERVICE"
 
-if RUNTYPE == "LOCAL":
+# Run as LOCAL or as "SERVICE"
+CRUE_RUNTYPE = os.environ.get("CRUE_RUNTYPE", "SERVICE").upper()
+
+if CRUE_RUNTYPE == "LOCAL":
     # ─── Archivos estáticos ──────────────────────────────────────────────────────
     #FORCE_SCRIPT_NAME = '/crue-traslados'
     STATIC_URL        = '/static/'

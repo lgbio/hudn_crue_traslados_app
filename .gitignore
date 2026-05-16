@@ -7,6 +7,7 @@ __pycache__/
 
 # Virtual environment
 .venv/
+migrations/
 .hypothesis/
 .pytest_cache
 .vscode/
