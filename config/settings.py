@@ -159,6 +159,11 @@ else:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ─── Sesiones ────────────────────────────────────────────────────────────────
+SESSION_COOKIE_AGE = 28800  # 8 horas (en segundos)
+SESSION_SAVE_EVERY_REQUEST = True  # Renueva la sesión en cada request (evita expiración por inactividad)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # La sesión persiste al cerrar el navegador
+
 # Modelo de usuario: se usa el del proyecto padre (django.contrib.auth.models.User por defecto)
 # AUTH_USER_MODEL no se define aquí — el proyecto padre lo controla.
 
