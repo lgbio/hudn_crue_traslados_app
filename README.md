@@ -2,6 +2,8 @@
 Sistema web Django para el registro y gestión de servicios de traslado de pacientes. Reemplaza el proceso actual basado en hojas de cálculo Excel, permitiendo a los usuarios (FUNCIONARIO y DIRECTOR) registrar, consultar, editar y eliminar registros de traslados, generar reportes en Excel y PDF, y controlar el cierre mensual de registros. El sistema no conserva datos históricos; los registros son limpiados por el DIRECTOR cuando se requiere reiniciar el sistema.
 
 ## LOG
+Jun/02/26: r0.93 : Fixed report month. Added year to GUI and Report.
+
 May/16/26: r0.92 : Fixed session expired problem.
 
 May/13/26: r0.91 : Fixed pagination. Removed obligatory fields. Converted to module

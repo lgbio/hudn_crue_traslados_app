@@ -130,7 +130,8 @@ STATICFILES_DIRS  = []
 DEBUG   = True
 
 # Run as LOCAL or as "SERVICE"
-CRUE_RUNTYPE = os.environ.get("CRUE_RUNTYPE", "SERVICE").upper()
+CRUE_RUNTYPE = os.environ.get("CRUE_RUNTYPE", "LOCAL").upper()
+#CRUE_RUNTYPE = os.environ.get("CRUE_RUNTYPE", "SERVICE").upper()
 
 if CRUE_RUNTYPE == "LOCAL":
     # ─── Archivos estáticos ──────────────────────────────────────────────────────
